@@ -1,5 +1,21 @@
 export type MealType = 'breakfast' | 'lunch' | 'pre_workout' | 'post_workout' | 'dinner' | 'snack';
 
+export type FitnessGoal =
+  | 'six_pack'
+  | 'bulking'
+  | 'fat_loss'
+  | 'strength'
+  | 'general_fitness'
+  | 'beginner';
+
+export type PreferredWorkoutTime = 'morning' | 'afternoon' | 'evening';
+export type WorkoutLocation = 'home' | 'gym' | 'both';
+export type EquipmentLevel = 'bodyweight' | 'backpack' | 'dumbbells' | 'resistance_bands' | 'full_gym';
+export type DietPreference = 'vegetarian' | 'vegan' | 'non_vegetarian';
+export type BudgetLevel = 'low' | 'moderate' | 'flexible';
+export type ExperienceLevel = 'beginner' | 'intermediate' | 'advanced';
+export type ActivityLevel = 'sedentary' | 'lightly_active' | 'moderately_active' | 'very_active';
+
 export interface FoodItem {
   id: string;
   date: string; // YYYY-MM-DD
@@ -14,6 +30,11 @@ export interface FoodItem {
   isEstimate: boolean;
   time?: string; // e.g. "08:30 AM" or "13:30"
   notes?: string;
+  imageUrl?: string;
+  prepInstructions?: string;
+  substitutions?: string;
+  estimatedCostInr?: number;
+  dietCategory?: 'vegetarian' | 'vegan' | 'non_vegetarian';
   createdAt: string;
 }
 
@@ -26,6 +47,7 @@ export interface MealTemplateItem {
   carbs: number;
   fats: number;
   isEstimate: boolean;
+  imageUrl?: string;
 }
 
 export interface MealTemplate {
@@ -39,6 +61,12 @@ export interface MealTemplate {
   totalFats: number;
   description: string;
   isVegetarian: boolean;
+  imageUrl?: string;
+  prepInstructions?: string;
+  substitutions?: string;
+  estimatedCostInr?: number;
+  recommendedTime?: string;
+  goalSuitability?: FitnessGoal[];
 }
 
 export type WorkoutType = 
@@ -56,6 +84,10 @@ export interface TargetExercise {
   targetRepsOrDuration: string; // e.g. "8-15 reps", "15-30s"
   targetRestSec: number;
   isAbs: boolean;
+  imageUrl?: string;
+  estimatedDurationMin?: number;
+  progressionRule?: string; // ACSM 2026 progressive overload instruction
+  beginnerAlternative?: string;
 }
 
 export interface WorkoutPlanDay {
@@ -68,6 +100,8 @@ export interface WorkoutPlanDay {
   description: string;
   targetExercises: TargetExercise[];
   isRestDay: boolean;
+  goalContext?: FitnessGoal;
+  warmupProtocol?: string;
 }
 
 export interface WorkoutLogEntry {
@@ -90,7 +124,7 @@ export interface ExerciseItem {
   name: string;
   category: 'Full Body' | 'Upper Body' | 'Lower Body' | 'Core & Abs' | 'Mobility';
   targetMuscles: string;
-  equipment: 'Bodyweight' | 'Backpack' | 'Wall/Chair' | 'Mat';
+  equipment: 'Bodyweight' | 'Backpack' | 'Wall/Chair' | 'Mat' | 'Dumbbells';
   instructions: string[];
   formCues: string[];
   substitutions: string;
@@ -98,6 +132,11 @@ export interface ExerciseItem {
   defaultRepsOrDuration: string;
   defaultRestSec: number;
   isAbs: boolean;
+  imageUrl?: string;
+  demoVideoUrl?: string;
+  estimatedDurationMin?: number;
+  progressionRule?: string;
+  difficulty?: 'Beginner' | 'Intermediate' | 'Advanced';
 }
 
 export interface BodyMeasurementEntry {
@@ -137,6 +176,22 @@ export interface DailyProgress {
   updatedAt: string;
 }
 
+export interface DailyScheduleItem {
+  id: string;
+  date: string; // YYYY-MM-DD
+  time: string; // e.g. "06:30 AM" or "17:30"
+  title: string;
+  category: 'wake' | 'meal' | 'snack' | 'workout' | 'hydration' | 'recovery' | 'sleep';
+  description: string;
+  durationMin?: number;
+  completed: boolean;
+  imageUrl?: string;
+  actionLink?: string;
+  calories?: number;
+  protein?: number;
+  researchNote?: string;
+}
+
 export interface UserSettings {
   age: number;
   heightCm: number;
@@ -157,6 +212,25 @@ export interface UserSettings {
   workoutFrequencyPerWeek: number;
   allowOutsideChallengeDates: boolean;
   storageMode: 'auto' | 'local' | 'cloud';
+
+  // Enhanced Research-Based Configuration
+  fitnessGoal?: FitnessGoal;
+  experienceLevel?: ExperienceLevel;
+  workoutLocation?: WorkoutLocation;
+  equipment?: EquipmentLevel;
+  dietPreference?: DietPreference;
+  budgetLevel?: BudgetLevel;
+  preferredWorkoutTime?: PreferredWorkoutTime;
+  wakeTime?: string; // e.g. "06:30"
+  sleepTime?: string; // e.g. "22:30"
+  workSchedule?: string; // e.g. "09:00 - 17:00"
+  workoutDurationMin?: number;
+  targetWeightKg?: number;
+  activityLevel?: ActivityLevel;
+  allergies?: string;
+  dislikedFoods?: string;
+  regionalCuisine?: string;
+  trainingDaysPerWeek?: number;
 }
 
 export interface CloudStatus {

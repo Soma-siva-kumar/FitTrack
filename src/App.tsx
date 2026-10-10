@@ -11,8 +11,9 @@ import { CheckinPage } from './pages/CheckinPage';
 import { FoodPage } from './pages/FoodPage';
 import { WorkoutPage } from './pages/WorkoutPage';
 import { AbsPage } from './pages/AbsPage';
-import { MeasurementsPage } from './pages/MeasurementsPage';
 import { WeightTrackerPage } from './pages/WeightTrackerPage';
+import { DailySchedulePage } from './pages/DailySchedulePage';
+import { MeasurementsPage } from './pages/MeasurementsPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { useFitness } from './context/FitnessContext';
@@ -54,6 +55,7 @@ export const App: React.FC = () => {
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
           <Routes>
             <Route path="/" element={<DashboardPage />} />
+            <Route path="/schedule" element={<DailySchedulePage />} />
             <Route path="/checkin" element={<CheckinPage />} />
             <Route path="/food" element={<FoodPage />} />
             <Route path="/workouts" element={<WorkoutPage />} />

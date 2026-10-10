@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useFitness } from '../../context/FitnessContext';
 import { TargetExercise, WorkoutLogEntry } from '../../types';
+import { FitnessImage } from '../common/FitnessImage';
+import { getExerciseImage } from '../../services/imageService';
 import {
   CheckCircle2,
   Circle,
@@ -12,6 +14,9 @@ import {
   Trash2,
   Edit2,
   Save,
+  ChevronDown,
+  ChevronUp,
+  Sparkles,
 } from 'lucide-react';
 
 interface Props {
@@ -37,6 +42,7 @@ export const DailyWorkoutLogger: React.FC<Props> = ({
 
   // Local state for pending unsaved sets
   const [activeFormNotes, setActiveFormNotes] = useState<Record<string, string>>({});
+  const [expandedTips, setExpandedTips] = useState<Record<string, boolean>>({});
 
   const handleToggleSet = async (
     ex: TargetExercise,
@@ -79,25 +85,49 @@ export const DailyWorkoutLogger: React.FC<Props> = ({
     <div className="space-y-4">
       {exercises.map((ex, exIndex) => {
         const exerciseLogs = workoutLogs.filter((l) => l.exerciseId === ex.exerciseId);
+        const imgUrl = ex.imageUrl || getExerciseImage(ex.exerciseId, ex.exerciseName);
+        const isTipExpanded = expandedTips[ex.exerciseId] || false;
 
         return (
           <div key={ex.exerciseId} className="card-base p-4 space-y-3">
             {/* Exercise Header */}
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-charcoal-800 pb-2.5">
-              <div className="flex items-center gap-2.5">
-                <span className="w-6 h-6 rounded-lg bg-charcoal-800 text-emerald-400 font-bold flex items-center justify-center text-xs">
-                  {exIndex + 1}
-                </span>
-                <div>
-                  <h4 className="font-bold text-white text-sm flex items-center gap-2">
-                    {ex.exerciseName}
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-charcoal-800 pb-2.5">
+              <div className="flex items-center gap-3 min-w-0">
+                <div
+                  onClick={() => onOpenExerciseInfo(ex.exerciseId)}
+                  className="w-13 h-13 sm:w-14 sm:h-14 rounded-xl overflow-hidden border border-charcoal-700/80 cursor-pointer hover:border-emerald-500/80 transition flex-shrink-0 relative group shadow-sm"
+                  title="Click to view technique & video"
+                >
+                  <FitnessImage
+                    src={imgUrl}
+                    alt={ex.exerciseName}
+                    aspectRatio="square"
+                    fallbackType="exercise"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/25 group-hover:bg-transparent transition flex items-center justify-center">
+                    <Info className="w-3.5 h-3.5 text-white opacity-0 group-hover:opacity-100 transition drop-shadow" />
+                  </div>
+                </div>
+
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="w-5 h-5 rounded-md bg-charcoal-800 text-emerald-400 font-bold flex items-center justify-center text-[10px]">
+                      #{exIndex + 1}
+                    </span>
+                    <h4
+                      onClick={() => onOpenExerciseInfo(ex.exerciseId)}
+                      className="font-bold text-white text-sm hover:text-emerald-300 cursor-pointer transition truncate"
+                    >
+                      {ex.exerciseName}
+                    </h4>
                     {ex.isAbs && (
                       <span className="px-1.5 py-0.5 rounded text-[10px] bg-purple-950 text-purple-300 border border-purple-800">
                         Abs Focus
                       </span>
                     )}
-                  </h4>
-                  <div className="text-[11px] text-slate-400">
+                  </div>
+                  <div className="text-[11px] text-slate-400 mt-0.5">
                     Target: <span className="text-white font-medium">{ex.targetSets} sets × {ex.targetRepsOrDuration}</span>
                     <span className="mx-1.5">•</span>
                     Rest: <span className="text-emerald-400 font-medium">{ex.targetRestSec}s</span>
@@ -153,6 +183,37 @@ export const DailyWorkoutLogger: React.FC<Props> = ({
                 )}
               </div>
             </div>
+
+            {/* ACSM 2026 Overload & Scaling Advice */}
+            {(ex.progressionRule || ex.beginnerAlternative) && (
+              <div className="px-3 py-2 rounded-xl bg-charcoal-850/80 border border-charcoal-800 text-[11px] space-y-1">
+                <button
+                  type="button"
+                  onClick={() => setExpandedTips((prev) => ({ ...prev, [ex.exerciseId]: !prev[ex.exerciseId] }))}
+                  className="w-full flex items-center justify-between text-slate-400 hover:text-slate-200 transition text-left"
+                >
+                  <span className="flex items-center gap-1.5 text-emerald-400 font-medium text-[11px]">
+                    <Sparkles className="w-3 h-3" />
+                    ACSM Overload & Scaling Advice
+                  </span>
+                  {isTipExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                </button>
+                {isTipExpanded && (
+                  <div className="pt-1.5 space-y-1 border-t border-charcoal-800 text-slate-300">
+                    {ex.progressionRule && (
+                      <p className="leading-relaxed">
+                        <strong className="text-emerald-300">Overload Rule:</strong> {ex.progressionRule}
+                      </p>
+                    )}
+                    {ex.beginnerAlternative && (
+                      <p className="leading-relaxed">
+                        <strong className="text-amber-300">Beginner Scaling:</strong> {ex.beginnerAlternative}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Sets Logging Table */}
             <div className="space-y-2">

@@ -8,10 +8,18 @@ import {
   UserSettings,
   WorkoutLogEntry,
   WorkoutPlanDay,
+  FitnessGoal,
+  DailyScheduleItem,
 } from '../types';
 import { DEFAULT_USER_SETTINGS, EXERCISE_LIBRARY, INITIAL_MEAL_TEMPLATES } from './seedData';
 import { generateInitial82DaySchedule } from './workoutGenerator';
-import { getChallengeDayNumber } from '../utils/dateUtils';
+import { getChallengeDayNumber, getAllChallengeDates, getDayOfWeekName } from '../utils/dateUtils';
+import {
+  calculateResearchTargets,
+  generateGoalWorkoutForDay,
+  generateGoalMealTemplates,
+  generateDailyTimetable,
+} from './recommendationEngine';
 
 // LocalStorage Keys
 const KEYS = {
@@ -23,6 +31,7 @@ const KEYS = {
   EXERCISE_LIBRARY: 'ft82_exercise_library',
   BODY_MEASUREMENTS: 'ft82_body_measurements',
   SETTINGS: 'ft82_settings',
+  DAILY_SCHEDULE: 'ft82_daily_schedule',
   INITIALIZED: 'ft82_initialized_v1',
 };
 
@@ -671,6 +680,143 @@ class StorageService {
       }
 
       return { success: true, message: 'All local data uploaded to Google Sheets successfully!' };
+    } catch (err) {
+      return { success: false, message: (err as Error).message };
+    }
+  }
+
+  // --- DAILY SCHEDULE & TIMETABLE (Morning to Evening) ---
+  public getDailySchedule(date: string): DailyScheduleItem[] {
+    const key = `${KEYS.DAILY_SCHEDULE}_${date}`;
+    const raw = localStorage.getItem(key);
+    if (raw) {
+      try {
+        return JSON.parse(raw);
+      } catch {
+        // Fall back to generation
+      }
+    }
+    // Generate fresh research-backed timetable
+    const generated = generateDailyTimetable(date, this.getSettings());
+    localStorage.setItem(key, JSON.stringify(generated));
+    return generated;
+  }
+
+  public saveDailySchedule(date: string, items: DailyScheduleItem[]): void {
+    const key = `${KEYS.DAILY_SCHEDULE}_${date}`;
+    localStorage.setItem(key, JSON.stringify(items));
+  }
+
+  public toggleScheduleItem(date: string, itemId: string): DailyScheduleItem[] {
+    const items = this.getDailySchedule(date);
+    const updated = items.map((item) =>
+      item.id === itemId ? { ...item, completed: !item.completed } : item
+    );
+    this.saveDailySchedule(date, updated);
+    return updated;
+  }
+
+  /**
+   * Dynamically regenerates workouts, meal templates, targets, and timetable based on selected goal
+   * Preserves all user history, logs, and completed workouts!
+   */
+  public async regeneratePlanForGoal(
+    goal: FitnessGoal,
+    options: Partial<UserSettings> = {}
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      const currentSettings = this.getSettings();
+      const mergedSettings: UserSettings = {
+        ...currentSettings,
+        ...options,
+        fitnessGoal: goal,
+      };
+
+      // Recalculate research-backed targets (ACSM 2026 & ISSN)
+      const targetResults = calculateResearchTargets(mergedSettings);
+      mergedSettings.calorieTarget = targetResults.calorieTarget;
+      mergedSettings.calorieTargetMin = targetResults.calorieTargetMin;
+      mergedSettings.calorieTargetMax = targetResults.calorieTargetMax;
+      mergedSettings.proteinTarget = targetResults.proteinTarget;
+      mergedSettings.proteinTargetMin = targetResults.proteinTargetMin;
+      mergedSettings.proteinTargetMax = targetResults.proteinTargetMax;
+      if (goal === 'bulking') {
+        mergedSettings.goal = 'Muscle Bulking & Progressive Hypertrophy';
+      } else if (goal === 'six_pack') {
+        mergedSettings.goal = 'Six-pack / Visible Abs & Core Density';
+      } else if (goal === 'fat_loss') {
+        mergedSettings.goal = 'Fat Loss & Lean Muscle Preservation';
+      } else if (goal === 'strength') {
+        mergedSettings.goal = 'Maximal Strength & Neuromuscular Power';
+      } else {
+        mergedSettings.goal = 'General Fitness & Sustainable Longevity';
+      }
+
+      await this.saveSettings(mergedSettings);
+
+      // Generate goal-specific meal templates
+      const newTemplates = generateGoalMealTemplates(
+        goal,
+        mergedSettings.dietPreference || 'vegetarian',
+        mergedSettings.budgetLevel || 'low'
+      );
+      localStorage.setItem(KEYS.MEAL_TEMPLATES, JSON.stringify(newTemplates));
+
+      // Regenerate future workout plans without overwriting past logs
+      const currentPlans = this.getWorkoutPlans();
+      const existingLogs = this.getWorkoutLogs();
+      const datesWithCompletedLogs = new Set(existingLogs.map((l) => l.date));
+
+      const updatedPlans = currentPlans.map((plan) => {
+        // If this date already has completed logs, PRESERVE historical record!
+        if (datesWithCompletedLogs.has(plan.date)) {
+          return plan;
+        }
+
+        const dayOfWeek = getDayOfWeekName(plan.date);
+        const dayNumber = getChallengeDayNumber(plan.date);
+        const newDayPlan = generateGoalWorkoutForDay(
+          goal,
+          mergedSettings.equipment || 'backpack',
+          mergedSettings.experienceLevel || 'beginner',
+          dayOfWeek,
+          dayNumber
+        );
+
+        return {
+          ...plan,
+          workoutType: newDayPlan.workoutType,
+          title: newDayPlan.title,
+          description: newDayPlan.description,
+          targetExercises: newDayPlan.targetExercises,
+          isRestDay: newDayPlan.isRestDay,
+          goalContext: goal,
+          warmupProtocol: newDayPlan.warmupProtocol,
+        };
+      });
+
+      localStorage.setItem(KEYS.WORKOUT_PLANS, JSON.stringify(updatedPlans));
+
+      // Clear cached future daily schedules so they regenerate with new timetable
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith(KEYS.DAILY_SCHEDULE)) {
+          const datePart = key.replace(`${KEYS.DAILY_SCHEDULE}_`, '');
+          if (!datesWithCompletedLogs.has(datePart)) {
+            localStorage.removeItem(key);
+          }
+        }
+      }
+
+      // Sync to cloud if connected
+      if (this.cloudStatus.connected) {
+        await this.syncAllToCloud();
+      }
+
+      return {
+        success: true,
+        message: `Plan successfully adapted for ${mergedSettings.goal}! Targets: ${targetResults.calorieTarget} kcal, ${targetResults.proteinTarget}g protein.`,
+      };
     } catch (err) {
       return { success: false, message: (err as Error).message };
     }

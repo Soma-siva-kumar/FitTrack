@@ -12,6 +12,8 @@ import {
   WeightGainProjection,
   WorkoutLogEntry,
   WorkoutPlanDay,
+  DailyScheduleItem,
+  FitnessGoal,
 } from '../types';
 import { storageService } from '../services/storageService';
 import { exportFullExcelWorkbook } from '../services/excelExportService';
@@ -56,6 +58,9 @@ interface FitnessContextType {
   updateMeasurement: (entry: BodyMeasurementEntry) => Promise<boolean>;
   deleteMeasurement: (id: string) => Promise<boolean>;
   weightProjection: WeightGainProjection;
+  dailySchedule: DailyScheduleItem[];
+  toggleScheduleItem: (itemId: string) => void;
+  regeneratePlanForGoal: (goal: FitnessGoal, options?: Partial<UserSettings>) => Promise<boolean>;
   stats: ChallengeStats;
   cloudStatus: CloudStatus;
   refreshCloudStatus: () => Promise<void>;
@@ -88,6 +93,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [mealTemplates, setMealTemplates] = useState<MealTemplate[]>([]);
   const [exerciseLibrary, setExerciseLibrary] = useState<ExerciseItem[]>([]);
   const [measurements, setMeasurements] = useState<BodyMeasurementEntry[]>([]);
+  const [dailySchedule, setDailySchedule] = useState<DailyScheduleItem[]>([]);
   const [cloudStatus, setCloudStatus] = useState<CloudStatus>(storageService.getCloudStatus());
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -112,6 +118,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setMealTemplates(storageService.getMealTemplates());
       setExerciseLibrary(storageService.getExerciseLibrary());
       setMeasurements(storageService.getMeasurements());
+      setDailySchedule(storageService.getDailySchedule(selectedDate));
 
       // Check cloud connectivity
       const status = await storageService.checkCloudStatus();
@@ -119,11 +126,15 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [selectedDate]);
 
   useEffect(() => {
     refreshAllData();
   }, [refreshAllData]);
+
+  useEffect(() => {
+    setDailySchedule(storageService.getDailySchedule(selectedDate));
+  }, [selectedDate]);
 
   const setSelectedDate = useCallback((date: string) => {
     // If setting outside challenge is restricted
@@ -596,6 +607,31 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
     showToast('Excel workbook exported successfully!');
   }, [dailyProgressList, foodLogs, mealTemplates, workoutPlans, workoutLogs, exerciseLibrary, measurements, settings, showToast]);
 
+  const toggleScheduleItem = useCallback((itemId: string) => {
+    const updated = storageService.toggleScheduleItem(selectedDate, itemId);
+    setDailySchedule(updated);
+  }, [selectedDate]);
+
+  const regeneratePlanForGoal = useCallback(
+    async (goal: FitnessGoal, options: Partial<UserSettings> = {}): Promise<boolean> => {
+      setIsSaving(true);
+      try {
+        const res = await storageService.regeneratePlanForGoal(goal, options);
+        if (res.success) {
+          await refreshAllData();
+          setDailySchedule(storageService.getDailySchedule(selectedDate));
+          showToast(res.message, 'success');
+          return true;
+        }
+        showToast(res.message, 'error');
+        return false;
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [refreshAllData, selectedDate, showToast]
+  );
+
   const value = {
     selectedDate,
     setSelectedDate,
@@ -628,6 +664,9 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
     updateMeasurement,
     deleteMeasurement,
     weightProjection,
+    dailySchedule,
+    toggleScheduleItem,
+    regeneratePlanForGoal,
     stats,
     cloudStatus,
     refreshCloudStatus,

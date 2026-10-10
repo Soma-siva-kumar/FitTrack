@@ -3,12 +3,15 @@ import { ChallengeProgressCard } from '../components/dashboard/ChallengeProgress
 import { MetricCards } from '../components/dashboard/MetricCards';
 import { DashboardCharts } from '../components/dashboard/DashboardCharts';
 import { QuickAddModal } from '../components/dashboard/QuickAddModal';
-import { Utensils, Droplets, Dumbbell, Scale, Plus, AlertCircle, Sparkles } from 'lucide-react';
+import { DailyTimetableCard } from '../components/schedule/DailyTimetableCard';
+import { PlanConfigModal } from '../components/settings/PlanConfigModal';
+import { Utensils, Droplets, Dumbbell, Scale, Plus, AlertCircle, Sparkles, SlidersHorizontal } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const DashboardPage: React.FC = () => {
   const [quickAddModalOpen, setQuickAddModalOpen] = useState(false);
   const [quickAddTab, setQuickAddTab] = useState<'meal' | 'water' | 'weight' | 'workout'>('meal');
+  const [planConfigModalOpen, setPlanConfigModalOpen] = useState(false);
 
   const handleOpenQuickAdd = (tab: 'meal' | 'water' | 'weight' | 'workout') => {
     setQuickAddTab(tab);
@@ -73,10 +76,13 @@ export const DashboardPage: React.FC = () => {
       {/* 2. Key Metrics Grid */}
       <MetricCards onOpenQuickAdd={handleOpenQuickAdd} />
 
-      {/* 3. Recharts Analytics */}
+      {/* 3. Daily Morning-to-Evening Timetable */}
+      <DailyTimetableCard onOpenPlanConfig={() => setPlanConfigModalOpen(true)} />
+
+      {/* 4. Recharts Analytics */}
       <DashboardCharts />
 
-      {/* 4. Realistic Educational & Safety Note */}
+      {/* 5. Realistic Educational & Safety Note */}
       <div className="p-4 rounded-xl bg-charcoal-900/60 border border-charcoal-800 text-xs text-slate-400 flex items-start gap-3">
         <AlertCircle className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
         <div className="space-y-1">
@@ -93,6 +99,12 @@ export const DashboardPage: React.FC = () => {
         isOpen={quickAddModalOpen}
         onClose={() => setQuickAddModalOpen(false)}
         initialTab={quickAddTab}
+      />
+
+      {/* Plan & Goal Configuration Modal */}
+      <PlanConfigModal
+        isOpen={planConfigModalOpen}
+        onClose={() => setPlanConfigModalOpen(false)}
       />
     </div>
   );

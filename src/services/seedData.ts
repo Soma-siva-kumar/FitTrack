@@ -1,4 +1,5 @@
 import { ExerciseItem, MealTemplate, UserSettings } from '../types';
+import { getExerciseImage, getMealImage } from './imageService';
 
 export const DEFAULT_USER_SETTINGS: UserSettings = {
   age: 22,
@@ -8,7 +9,7 @@ export const DEFAULT_USER_SETTINGS: UserSettings = {
   trainingExperience: 'Beginner',
   trainingLocation: 'Home',
   budget: 'Low',
-  goal: 'Build muscle and abdominal strength',
+  goal: 'Six-pack / visible abs and muscle building',
   calorieTargetMin: 2000,
   calorieTargetMax: 2200,
   calorieTarget: 2100,
@@ -20,6 +21,25 @@ export const DEFAULT_USER_SETTINGS: UserSettings = {
   workoutFrequencyPerWeek: 3,
   allowOutsideChallengeDates: false,
   storageMode: 'auto',
+
+  // Enhanced Research-Based Attributes
+  fitnessGoal: 'six_pack',
+  experienceLevel: 'beginner',
+  workoutLocation: 'home',
+  equipment: 'backpack',
+  dietPreference: 'vegetarian',
+  budgetLevel: 'low',
+  preferredWorkoutTime: 'evening',
+  wakeTime: '06:30',
+  sleepTime: '22:30',
+  workSchedule: '09:00 - 17:00',
+  workoutDurationMin: 60,
+  targetWeightKg: 53.5,
+  activityLevel: 'moderately_active',
+  allergies: 'None',
+  dislikedFoods: 'Eggs, meat, fish',
+  regionalCuisine: 'Indian Vegetarian',
+  trainingDaysPerWeek: 3,
 };
 
 export const INITIAL_MEAL_TEMPLATES: MealTemplate[] = [

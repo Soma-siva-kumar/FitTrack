@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard,
+  Clock,
   CheckCircle2,
   Utensils,
   Dumbbell,
@@ -22,6 +23,7 @@ interface Props {
 
 const navItems = [
   { path: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { path: '/schedule', label: 'Daily Timetable', icon: Clock },
   { path: '/checkin', label: 'Daily Check-in', icon: CheckCircle2 },
   { path: '/food', label: 'Food Tracker', icon: Utensils },
   { path: '/workouts', label: 'Workout Planner', icon: Dumbbell },

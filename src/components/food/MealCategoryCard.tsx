@@ -1,5 +1,7 @@
 import React from 'react';
 import { FoodItem, MealType } from '../../types';
+import { FitnessImage } from '../common/FitnessImage';
+import { getMealImage } from '../../services/imageService';
 import { Plus, Edit2, Trash2, AlertCircle, Clock } from 'lucide-react';
 
 interface Props {
@@ -57,42 +59,57 @@ export const MealCategoryCard: React.FC<Props> = ({
       {/* Items List */}
       {items.length > 0 ? (
         <div className="space-y-2">
-          {items.map((item) => (
-            <div
-              key={item.id}
-              className="p-2.5 rounded-xl bg-charcoal-850 hover:bg-charcoal-800/80 border border-charcoal-800 flex items-center justify-between gap-3 text-xs transition"
-            >
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="font-semibold text-white truncate">{item.foodName}</span>
-                  <span className="text-[11px] text-slate-400">
-                    ({item.quantity} {item.unit})
-                  </span>
-                  {item.time && (
-                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-cyan-950/60 text-cyan-300 border border-cyan-850/80 flex items-center gap-1 font-mono">
-                      <Clock className="w-2.5 h-2.5 text-cyan-400" />
-                      <span>{item.time}</span>
-                    </span>
-                  )}
-                  {item.isEstimate && (
-                    <span
-                      className="px-1.5 py-0.2 rounded text-[10px] bg-charcoal-800 text-amber-400 border border-amber-800/40 flex items-center gap-0.5"
-                      title="Estimated nutrition value"
-                    >
-                      <AlertCircle className="w-2.5 h-2.5" />
-                      <span>Est</span>
-                    </span>
-                  )}
-                </div>
+          {items.map((item) => {
+            const mealImg = getMealImage(item.foodName);
 
-                <div className="flex items-center gap-3 text-[11px] text-slate-400 mt-1">
-                  <span className="text-amber-400 font-medium">{item.calories} kcal</span>
-                  <span className="text-emerald-400 font-medium">{item.protein}g P</span>
-                  {item.carbs > 0 && <span>{item.carbs}g C</span>}
-                  {item.fats > 0 && <span>{item.fats}g F</span>}
-                  {item.notes && <span className="text-slate-400 truncate max-w-xs">• {item.notes}</span>}
+            return (
+              <div
+                key={item.id}
+                className="p-2.5 rounded-xl bg-charcoal-850 hover:bg-charcoal-800/80 border border-charcoal-800 flex items-center justify-between gap-3 text-xs transition"
+              >
+                <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                  <div className="w-11 h-11 rounded-lg overflow-hidden border border-charcoal-700/80 flex-shrink-0 shadow-sm">
+                    <FitnessImage
+                      src={mealImg}
+                      alt={item.foodName}
+                      aspectRatio="square"
+                      fallbackType="food"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="font-semibold text-white truncate">{item.foodName}</span>
+                      <span className="text-[11px] text-slate-400">
+                        ({item.quantity} {item.unit})
+                      </span>
+                      {item.time && (
+                        <span className="px-1.5 py-0.5 rounded text-[10px] bg-cyan-950/60 text-cyan-300 border border-cyan-850/80 flex items-center gap-1 font-mono">
+                          <Clock className="w-2.5 h-2.5 text-cyan-400" />
+                          <span>{item.time}</span>
+                        </span>
+                      )}
+                      {item.isEstimate && (
+                        <span
+                          className="px-1.5 py-0.2 rounded text-[10px] bg-charcoal-800 text-amber-400 border border-amber-800/40 flex items-center gap-0.5"
+                          title="Estimated nutrition value"
+                        >
+                          <AlertCircle className="w-2.5 h-2.5" />
+                          <span>Est</span>
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2 sm:gap-3 text-[11px] text-slate-400 mt-1 flex-wrap">
+                      <span className="text-amber-400 font-medium">{item.calories} kcal</span>
+                      <span className="text-emerald-400 font-medium">{item.protein}g P</span>
+                      {item.carbs > 0 && <span>{item.carbs}g C</span>}
+                      {item.fats > 0 && <span>{item.fats}g F</span>}
+                      {item.notes && <span className="text-slate-400 truncate max-w-xs">• {item.notes}</span>}
+                    </div>
+                  </div>
                 </div>
-              </div>
 
               <div className="flex items-center gap-1">
                 <button
@@ -111,7 +128,8 @@ export const MealCategoryCard: React.FC<Props> = ({
                 </button>
               </div>
             </div>
-          ))}
+          );
+        })}
 
           {/* Micro summary */}
           <div className="text-[10px] text-slate-400 pt-1 flex justify-between px-1">
