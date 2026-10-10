@@ -31,9 +31,6 @@ export const Navbar: React.FC<Props> = ({ onToggleSidebar, onOpenCloudModal }) =
           <div>
             <div className="flex items-center gap-1.5">
               <span className="text-base font-extrabold tracking-tight text-white">FitTrack</span>
-              <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                82
-              </span>
             </div>
             <p className="text-[10px] text-slate-400 hidden sm:block tracking-wide">
               Personal Six-Pack & Muscle Dashboard

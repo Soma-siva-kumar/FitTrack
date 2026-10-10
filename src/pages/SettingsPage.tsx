@@ -96,7 +96,7 @@ export const SettingsPage: React.FC = () => {
         <p className="text-xs text-slate-300 leading-relaxed">
           {cloudStatus.connected
             ? `Connected to Google Spreadsheet (${cloudStatus.sheetId}). Data is automatically preserved in Google Sheets.`
-            : 'FitTrack 82 is currently operating in offline-safe Local Storage Mode. You can freely use all features. To persist data to your private Google Sheets spreadsheet, configure Netlify environment variables.'}
+            : 'FitTrack is currently operating in offline-safe Local Storage Mode. You can freely use all features. To persist data to your private Google Sheets spreadsheet, configure Netlify environment variables.'}
         </p>
 
         <div className="flex flex-wrap items-center gap-2.5 pt-1">
@@ -293,7 +293,7 @@ export const SettingsPage: React.FC = () => {
                   Calories: f.calories,
                   Protein: f.protein,
                 })),
-                'FitTrack82_Food_Logs.csv'
+                'FitTrack_Food_Logs.csv'
               )
             }
             className="p-3 rounded-xl bg-charcoal-850 hover:bg-charcoal-800 border border-charcoal-800 text-slate-200 text-xs font-medium transition flex items-center justify-center gap-2"
@@ -313,7 +313,7 @@ export const SettingsPage: React.FC = () => {
                   BackpackKg: w.weightKg,
                   Completed: w.completed ? 'YES' : 'NO',
                 })),
-                'FitTrack82_Workouts.csv'
+                'FitTrack_Workouts.csv'
               )
             }
             className="p-3 rounded-xl bg-charcoal-850 hover:bg-charcoal-800 border border-charcoal-800 text-slate-200 text-xs font-medium transition flex items-center justify-center gap-2"
@@ -331,7 +331,7 @@ export const SettingsPage: React.FC = () => {
                   WaistCm: m.waistCm || '',
                   Notes: m.performanceNotes || '',
                 })),
-                'FitTrack82_Measurements.csv'
+                'FitTrack_Measurements.csv'
               )
             }
             className="p-3 rounded-xl bg-charcoal-850 hover:bg-charcoal-800 border border-charcoal-800 text-slate-200 text-xs font-medium transition flex items-center justify-center gap-2"

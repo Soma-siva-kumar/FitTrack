@@ -17,6 +17,8 @@ import { ReportsPage } from './pages/ReportsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { useFitness } from './context/FitnessContext';
 
+import { Flame } from 'lucide-react';
+
 export const App: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [cloudModalOpen, setCloudModalOpen] = useState(false);
@@ -25,10 +27,10 @@ export const App: React.FC = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-charcoal-950 flex flex-col items-center justify-center space-y-4">
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center animate-pulse">
-          <span className="text-charcoal-950 font-black text-xl">82</span>
+        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-xl shadow-emerald-950/60 animate-pulse">
+          <Flame className="w-6 h-6 text-charcoal-950 fill-charcoal-950" />
         </div>
-        <p className="text-sm font-semibold text-slate-300">Loading FitTrack 82...</p>
+        <p className="text-sm font-semibold text-slate-300">Loading FitTrack...</p>
       </div>
     );
   }

@@ -1,6 +1,6 @@
-# FitTrack 82 — Personal Six-Pack Fitness Dashboard
+# FitTrack — Personal Six-Pack Fitness Dashboard
 
-**FitTrack 82** is a personal, mobile-responsive web application designed to track an 82-day muscle-building and six-pack journey from **October 11, 2026 through December 31, 2026 (inclusive)**.
+**FitTrack** is a personal, mobile-responsive web application designed to track an 82-day muscle-building and six-pack journey from **October 11, 2026 through December 31, 2026 (inclusive)**.
 
 Built specifically for beginner home training with zero or minimal equipment (bodyweight, backpack, chair/bed elevation) and an affordable Indian vegetarian diet.
 

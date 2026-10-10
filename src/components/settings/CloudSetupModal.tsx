@@ -30,7 +30,7 @@ export const CloudSetupModal: React.FC<Props> = ({ isOpen, onClose }) => {
       isOpen={isOpen}
       onClose={onClose}
       title="Google Sheets Cloud Storage Setup"
-      subtitle="Connect FitTrack 82 with your private Google Spreadsheet"
+      subtitle="Connect FitTrack with your private Google Spreadsheet"
       maxWidth="xl"
     >
       <div className="space-y-5 text-sm">
@@ -56,7 +56,7 @@ export const CloudSetupModal: React.FC<Props> = ({ isOpen, onClose }) => {
             <p className="text-xs text-slate-300 mt-1 leading-relaxed">
               {cloudStatus.connected
                 ? `Successfully synced with Google Sheet ID: ${cloudStatus.sheetId || 'Configured'}. All updates persist directly to Google Sheets.`
-                : 'FitTrack 82 is currently storing data in your browser local storage. You can record workouts and food freely. To sync across your phone and laptop, follow the 4 setup steps below.'}
+                : 'FitTrack is currently storing data in your browser local storage. You can record workouts and food freely. To sync across your phone and laptop, follow the 4 setup steps below.'}
             </p>
             {cloudStatus.errorMessage && (
               <p className="text-xs text-rose-300 mt-1.5 font-mono bg-charcoal-900/60 p-2 rounded border border-rose-900/50">
@@ -75,7 +75,7 @@ export const CloudSetupModal: React.FC<Props> = ({ isOpen, onClose }) => {
           <div className="space-y-2.5 text-xs text-slate-300">
             <div className="p-3 rounded-xl bg-charcoal-850 border border-charcoal-800 space-y-1">
               <span className="font-semibold text-emerald-400">Step 1: Create a Google Sheet</span>
-              <p>Create a blank Google Sheet in your Google Drive (e.g. named <code>FitTrack 82 Database</code>). Copy the Sheet ID from its URL.</p>
+              <p>Create a blank Google Sheet in your Google Drive (e.g. named <code>FitTrack Database</code>). Copy the Sheet ID from its URL.</p>
               <div className="text-[11px] text-slate-400 font-mono">
                 docs.google.com/spreadsheets/d/<strong>[SPREADSHEET_ID]</strong>/edit
               </div>

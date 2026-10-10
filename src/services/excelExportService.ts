@@ -43,7 +43,7 @@ function getColumnWidths(data: Record<string, unknown>[]): { wch: number }[] {
 /**
  * Generate and download complete .xlsx workbook containing all 8 tabs
  */
-export function exportFullExcelWorkbook(payload: ExportDataPayload, filename = 'FitTrack82_Full_Backup.xlsx') {
+export function exportFullExcelWorkbook(payload: ExportDataPayload, filename = 'FitTrack_Full_Backup.xlsx') {
   const wb = XLSX.utils.book_new();
 
   // 1. DailyProgress tab
